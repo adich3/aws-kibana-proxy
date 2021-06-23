@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana-proxy
+  labels:
+    app: kibana-proxy
+spec:
+  selector:
+    matchLabels:
+      app: kibana-proxy
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: kibana-proxy
+    spec:
+      containers:
+      - image: chadi3/aws-kibana-proxy:latest
+        name: kibana-proxy
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "250Mi"
+        livenessProbe:
+          httpGet:
+            path: /envoy/healthz
+            port: kibana
+            scheme: HTTPS
+          initialDelaySeconds: 90
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /envoy/healthz
+            port: kibana 
+            scheme: HTTPS
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        env:
+        - name: AWS_ELS_HOST
+          value: ENVVARVALUE       
+        ports:
+        - containerPort: 443
+          name: kibana
+      restartPolicy: Always
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: kibana-proxy-https
+spec:
+  selector:
+    app: kibana-proxy
+  type:  ClusterIP
+  ports:
+  - name: kibana-https
+    port:  443
+    targetPort: kibana
