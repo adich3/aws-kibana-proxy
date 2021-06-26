@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/auth-realm: Authentication Required 
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+  name: kibana-proxy-ingress
+spec:
+  rules:
+  - host: kibana.org 
+    http:
+      paths:
+      - backend:
+          serviceName: kibana-proxy-https 
+          servicePort: 443
+        path: /
+        pathType: ImplementationSpecific
