@@ -19,7 +19,7 @@ spec:
         app: kibana-proxy
     spec:
       containers:
-      - image: chadi3/aws-kibana-proxy:latest
+      - image: chadi3/aws-kibana-proxy:v1
         name: kibana-proxy
         resources:
           requests:
